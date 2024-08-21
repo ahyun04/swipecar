@@ -3,29 +3,40 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class App : MonoBehaviour
-{ 
-    //벡터의 뺄셈을 연습
-    //필드를 만든다 A, B(gameobject)
-    public GameObject A;
-    public GameObject B;
+{
+    public InputManager inputManager;
+    public CarController carController;
+    public Transform flagTrans;
+    public GameDirector gameDirector;
 
-    [SerializeField] private Transform b;  
-
-    private void Start()
+    public void Start()
     {
-        A.transform.position = Vector3.zero;
+        this.CalcDistanceAndUpdateUI();
+
+        this.inputManager.swipeAction = (direction) => {
+
+            Debug.Log(direction);
+
+            carController.Move(direction);
+
+        };
+
+        carController.moveAction = () => {
+
+            this.CalcDistanceAndUpdateUI();
+
+        };
     }
 
-    //이벤트 함수
-    private void Update()
+    //자동차 오브젝트와 깃발 오브젝트의 거리를 계산후 gameDirector의 UpdateUI를 호출 하는 메서드 
+
+    private void CalcDistanceAndUpdateUI()
     {
-        //왼쪽 마우스 버튼을 눌렀을 때 출력
-        bool isDown = Input.GetMouseButtonDown(0); //0: 왼쪽 클릭
-        if (isDown)
-        {
-            Debug.Log("회면을 눌렀습니다");
-            Vector3 mousePos = Input.mousePosition;
-            Debug.Log($"마우스 픽셀 위치 : {mousePos}");
-        }
+        Vector3 carPos = carController.gameObject.transform.position;
+        Vector3 flagPos = this.flagTrans.position;
+
+        float distanceX = flagPos.x - carPos.x;
+
+        gameDirector.UpdateUI(distanceX);
     }
 }
